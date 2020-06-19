@@ -1,23 +1,23 @@
 'use strict';
 
-var express = require('express');
-var cors = require('cors');
-
-// require and use "multer"...
-
-var app = express();
+const express = require('express');
+const cors = require('cors');
+const multer  = require('multer');
+const upload = multer();
+const app = express();
 
 app.use(cors());
-app.use('/public', express.static(process.cwd() + '/public'));
+app.use(express.static('public'));
 
-app.get('/', function (req, res) {
-     res.sendFile(process.cwd() + '/views/index.html');
-  });
+app.set('view engine', 'pug');
 
-app.get('/hello', function(req, res){
-  res.json({greetings: "Hello, API"});
+app.get('/', (req, res) => res.render('index'));
+
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+  const { originalname, mimetype, size } = req.file;
+  return res.json({ name: originalname, type: mimetype, size: size })                     
 });
 
-app.listen(process.env.PORT || 3000, function () {
-  console.log('Node.js listening ...');
+const listener = app.listen(process.env.PORT || 3000, () => {
+  console.log(`Your app is listening on port ${listener.address().port}`);
 });
